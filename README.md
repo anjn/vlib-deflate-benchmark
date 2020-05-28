@@ -49,7 +49,7 @@ MB/s = 10^6 bytes/second
 | Num instances | Clock Freq. | Throughput |
 |---------------|-------------|------------|
 | 1             | 287MHz      | 1700MB/s   |
-| 4             | 271MHz      | 4600~5200MB/s  |
+| 4             | 271MHz      | 4400~5300MB/s  |
 
 
 
