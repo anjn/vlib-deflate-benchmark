@@ -39,14 +39,14 @@ MB/s = 10^6 bytes/second
 
 * xilinx_aws-vu9p-f1_shell-v04261818_201920_2
 
-| Num instances | Clock Freq. | Throughput |
-|---------------|-------------|------------|
-| 1             | 250MHz      | 1350MB/s   |
-| 4             | 213MHz      | 4010MB/s   |
+| Num instances | Clock Freq. [MHz] | Throughput [MB/s] |
+|---------------|-------------------|-------------------|
+| 1             | 250               | 1350              |
+| 4             | 213               | 4010              |
 
 * xilinx_u200_xdma_201830_2 @ PCIe Gen3 x8
 
-| Num instances | Clock Freq. | Throughput |
-|---------------|-------------|------------|
-| 1             | 287MHz      | 1700MB/s   |
-| 4             | 271MHz      | 4400~5300MB/s  |
+| Num instances | Clock Freq. [MHz] | Throughput [MB/s] |
+|---------------|-------------------|-------------------|
+| 1             | 287               | 1700              |
+| 4             | 271               | 4400~5300         |
