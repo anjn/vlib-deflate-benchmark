@@ -44,13 +44,9 @@ MB/s = 10^6 bytes/second
 | 1             | 250MHz      | 1350MB/s   |
 | 4             | 213MHz      | 4010MB/s   |
 
-* xilinx_u200_xdma_201830_2
+* xilinx_u200_xdma_201830_2 @ PCIe Gen3 x8
 
 | Num instances | Clock Freq. | Throughput |
 |---------------|-------------|------------|
 | 1             | 287MHz      | 1700MB/s   |
 | 4             | 271MHz      | 4400~5300MB/s  |
-
-
-
-
