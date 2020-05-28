@@ -1,0 +1,8 @@
+*.log
+*.jou
+*.csv
+*.json
+*.txt
+_x_temp*
+build_dir*
+.Xil
