@@ -55,7 +55,7 @@ uint64_t get_file_size(std::ifstream& file) {
     return file_size;
 }
 
-void compress_file(deflate::deflate_fpga& def, std::string& in_file_name)
+void compress_file(deflate::deflate_fpga& def, std::string& in_file_name, int num_test = 1)
 {
   auto out_file_name = in_file_name + ".zlib";
 
@@ -91,15 +91,20 @@ void compress_file(deflate::deflate_fpga& def, std::string& in_file_name)
 
   // Compress
   uint64_t out_size;
-  double throughput;
+
+  for (int i=0; i<num_test; i++)
   {
-    stopwatch sw("Compress");
-    out_size = def.compress(in.data(), out.data(), in_size);
-    sw.stop();
-    //double throughput = in_size / sw.duration / (1<<20);
-    throughput = in_size / sw.duration / 1e6;
+    double throughput;
+    {
+      stopwatch sw("Compress");
+      out_size = def.compress(in.data(), out.data(), in_size);
+      sw.stop();
+      //double throughput = in_size / sw.duration / (1<<20);
+      throughput = in_size / sw.duration / 1e6;
+    }
+    std::cout << "Throughput\t\t: " << std::fixed << std::setprecision(1) << throughput << " MB/s" << std::endl;;
   }
-  std::cout << "Throughput\t\t: " << std::fixed << std::setprecision(1) << throughput << " MB/s" << std::endl;;
+
   std::cout << "Output size\t\t: " << out_size << std::endl;
   std::cout << "Compression ratio\t: " << std::fixed << std::setprecision(3) << ((double)in_size/out_size) << std::endl;;
 
@@ -123,13 +128,16 @@ int main(int argc, char* argv[]) {
   parser.addSwitch("--xclbin", "-x", "xclbin file", "");
   parser.addSwitch("--input", "-i", "Input file", "");
   parser.addSwitch("--num_cu", "-n", "The number of available compute units per device", "1");
+  parser.addSwitch("--num_test", "-t", "Num test", "1");
   parser.parse(argc, argv);
 
   std::string xclbin = parser.value("xclbin");
   std::string input = parser.value("input");
   std::string num_cu_str = parser.value("num_cu");
+  std::string num_test_str = parser.value("num_test");
 
   const int num_cu = std::atoi(num_cu_str.c_str());
+  const int num_test = std::atoi(num_test_str.c_str());
 
   auto def = std::make_unique<deflate::deflate_fpga>();
   {
@@ -137,7 +145,7 @@ int main(int argc, char* argv[]) {
     def->init(xclbin, num_cu);
   }
 
-  compress_file(*def, input);
+  compress_file(*def, input, num_test);
 
   {
     stopwatch sw("Unload FPGA");
