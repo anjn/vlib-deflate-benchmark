@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -e
 
 if [[ $# -lt 1 ]] ; then
   echo Usage: $0 INPUT_FILE
@@ -10,8 +11,8 @@ if [[ $PLATFORM = "" ]] ; then
   exit
 fi
 
-INPUT=$1
-XCLBIN=${XCLBINL:-./build_dir.hw.$PLATFORM/compress_decompress.xclbin}
+INPUT=$1; shift
+XCLBIN=${XCLBIN:-./build_dir.hw.$PLATFORM/compress_decompress.xclbin}
 
 make host TARGET=hw DEVICE=$PLATFORM
-./build_dir.hw.$PLATFORM/deflate -sx $XCLBIN -c $INPUT
+time ./build_dir.hw.$PLATFORM/deflate -x $XCLBIN -i $INPUT $*

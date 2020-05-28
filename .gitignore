@@ -3,6 +3,7 @@
 *.csv
 *.json
 *.txt
-_x_temp*
-build_dir*
-.Xil
+/_x_temp*
+/build_dir*
+/.Xil
+/reports

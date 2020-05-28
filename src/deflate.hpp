@@ -85,10 +85,11 @@ struct deflate_worker
     q = cl::CommandQueue(context, device);
 
     // Create kernels
+    cl_int err = 0;
     std::string kernel_name = "xilLz77Compress:{xilLz77Compress_"s + std::to_string(cu.index + 1) + "}";
-    lz77_kernel = cl::Kernel(program, kernel_name.c_str());
+    OCL_CHECK(err, lz77_kernel = cl::Kernel(program, kernel_name.c_str(), &err));
     kernel_name = "xilHuffmanKernel:{xilHuffmanKernel_"s + std::to_string(cu.index + 1) + "}";
-    huffman_kernel = cl::Kernel(program, kernel_name.c_str());
+    OCL_CHECK(err, huffman_kernel = cl::Kernel(program, kernel_name.c_str(), &err));
 
     // Allocate host buffers
     host_compress_size.resize(num_engines_per_kernel);
@@ -266,7 +267,7 @@ struct deflate_fpga
       enqueue_compress_thread.join();
   }
 
-  void init(const std::string& xclbin_file)
+  void init(const std::string& xclbin_file, const int num_cus_per_device = 1)
   {
     // Init OpenCL
     devices = xcl::get_xil_devices();
@@ -284,7 +285,6 @@ struct deflate_fpga
 
     // Init workers
     const int num_workers_per_cu = 6;
-    const int num_cus_per_device = 1;
     const int num_workers_per_device = num_cus_per_device * num_workers_per_cu;
     const int num_cus = num_cus_per_device * devices.size();
     const int num_workers = num_workers_per_device * devices.size();

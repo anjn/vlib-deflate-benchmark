@@ -40,7 +40,7 @@ struct stopwatch {
   stopwatch(const std::string& name_): name(name_), start(clock_now()), duration(0) {}
   ~stopwatch() {
     if (end == clock_type()) stop();
-    std::cout << name << ": " << std::fixed << std::setprecision(3) << (duration * 1000) << " ms" << std::endl;
+    std::cout << name << "\t\t: " << std::fixed << std::setprecision(3) << (duration * 1000) << " ms" << std::endl;
   }
   void stop() {
     end = clock_now();
@@ -60,7 +60,7 @@ void compress_file(deflate::deflate_fpga& def, std::string& in_file_name)
   auto out_file_name = in_file_name + ".zlib";
 
   // Open input file
-  std::cout << "Open: " << in_file_name << std::endl;
+  std::cout << "Open\t\t\t: " << in_file_name << std::endl;
   std::ifstream in_file(in_file_name, std::ios::in | std::ios::binary);
   if (!in_file) {
     std::cout << "Unable to open file";
@@ -69,7 +69,7 @@ void compress_file(deflate::deflate_fpga& def, std::string& in_file_name)
 
   // Check file size
   const auto in_size = get_file_size(in_file);
-  std::cout << "Input size: " << in_size << " bytes" << std::endl;
+  std::cout << "Input size\t\t: " << in_size << " bytes" << std::endl;
 
   // Allocate buffers
   deflate::host_buffer<uint8_t> in;
@@ -87,15 +87,17 @@ void compress_file(deflate::deflate_fpga& def, std::string& in_file_name)
   }
 
   // Compress
-  uint64_t out_size = 0;
+  uint64_t out_size;
+  double throughput;
   {
     stopwatch sw("Compress");
     out_size = def.compress(in.data(), out.data(), in_size);
     sw.stop();
     //double throughput = in_size / sw.duration / (1<<20);
-    double throughput = in_size / sw.duration / 1e6;
-    std::cout << "Throughput: " << std::fixed << std::setprecision(3) << throughput << " MB/s" << std::endl;;
+    throughput = in_size / sw.duration / 1e6;
   }
+  std::cout << "Throughput\t\t: " << std::fixed << std::setprecision(1) << throughput << " MB/s" << std::endl;;
+  std::cout << "Compression ratio\t: " << std::fixed << std::setprecision(3) << ((double)in_size/out_size) << std::endl;;
 
   // Write output file
   {
@@ -114,20 +116,24 @@ void compress_file(deflate::deflate_fpga& def, std::string& in_file_name)
 
 int main(int argc, char* argv[]) {
   sda::utils::CmdLineParser parser;
-  parser.addSwitch("--compress", "-c", "Compress", "");
-  parser.addSwitch("--single_xclbin", "-sx", "Single XCLBIN", "single");
+  parser.addSwitch("--xclbin", "-x", "xclbin file", "");
+  parser.addSwitch("--input", "-i", "Input file", "");
+  parser.addSwitch("--num_cu", "-n", "The number of available compute units per device", "1");
   parser.parse(argc, argv);
 
-  std::string compress_mod = parser.value("compress");
-  std::string single_bin = parser.value("single_xclbin");
+  std::string xclbin = parser.value("xclbin");
+  std::string input = parser.value("input");
+  std::string num_cu_str = parser.value("num_cu");
+
+  const int num_cu = std::atoi(num_cu_str.c_str());
 
   auto def = std::make_unique<deflate::deflate_fpga>();
   {
     stopwatch sw("Load FPGA");
-    def->init(single_bin);
+    def->init(xclbin, num_cu);
   }
 
-  compress_file(*def, compress_mod);
+  compress_file(*def, input);
 
   {
     stopwatch sw("Unload FPGA");
