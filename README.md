@@ -28,4 +28,6 @@ export PLATFORM=xilinx_u200_xdma_201830_2
 export PLATFORM=$AWS_PLATFORM
 
 ./run.sh INPUT_FILE
+# or, you can specify the number of cus
+./run.sh INPUT_FILE -n 4
 ```
