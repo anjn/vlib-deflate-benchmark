@@ -11,6 +11,7 @@ if [[ $PLATFORM = "" ]] ; then
   exit
 fi
 
+PLATFORM=$(basename $PLATFORM | sed 's/\.xpfm$//')
 INPUT=$1; shift
 XCLBIN=${XCLBIN:-./build_dir.hw.$PLATFORM/compress_decompress.xclbin}
 
