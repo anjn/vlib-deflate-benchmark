@@ -86,6 +86,9 @@ void compress_file(deflate::deflate_fpga& def, std::string& in_file_name)
     in_file.read((char*)in.data(), in_size);
   }
 
+  // Warming up
+  def.compress(in.data(), out.data(), in_size/10);
+
   // Compress
   uint64_t out_size;
   double throughput;
@@ -97,6 +100,7 @@ void compress_file(deflate::deflate_fpga& def, std::string& in_file_name)
     throughput = in_size / sw.duration / 1e6;
   }
   std::cout << "Throughput\t\t: " << std::fixed << std::setprecision(1) << throughput << " MB/s" << std::endl;;
+  std::cout << "Output size\t\t: " << out_size << std::endl;
   std::cout << "Compression ratio\t: " << std::fixed << std::setprecision(3) << ((double)in_size/out_size) << std::endl;;
 
   // Write output file
