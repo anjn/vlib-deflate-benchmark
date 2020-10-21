@@ -7,3 +7,5 @@
 /build_dir*
 /.Xil
 /reports
+/.ipcache
+/sample_link.ini

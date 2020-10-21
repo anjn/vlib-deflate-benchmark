@@ -126,10 +126,12 @@ ifneq ($(HOST_ARCH), x86)
 endif
 
 ############################## Setting up Kernel Variables ##############################
+NUM_THREADS ?= 16
+
 # Kernel compiler global settings
 VPP_FLAGS += -t $(TARGET) --platform $(XPLATFORM) --save-temps
 #VPP_FLAGS += --kernel_frequency 500
-LDCLFLAGS += --optimize 3 --jobs 8
+LDCLFLAGS += --optimize 3 --jobs $(NUM_THREADS)
 VPP_FLAGS +=-I$(XFLIB_DIR)/L1/include/hw
 VPP_FLAGS +=-I$(XFLIB_DIR)/L2/include
 VPP_FLAGS +=-I$(XFLIB_DIR)/L2/src
@@ -139,7 +141,9 @@ VPP_FLAGS += --config $(CUR_DIR)/advanced.ini
 VPP_FLAGS += -DPARALLEL_BLOCK=8 -DHIGH_FMAX_II=2 -DMULTIPLE_BYTES=4 
 
 # Kernel linker flags
-LDCLFLAGS_compress_decompress += --config $(CUR_DIR)/opts.ini
+LDCLFLAGS_compress_decompress += --config $(CUR_DIR)/opts_u280.ini
+LDCLFLAGS_compress_decompress += --advanced.param compiler.userPostSysLinkOverlayTcl=$(shell readlink -f vivado_param.tcl)
+LDCLFLAGS_compress_decompress += --xp "vivado_prop:run.impl_1.{STEPS.ROUTE_DESIGN.ARGS.MORE OPTIONS}={-ultrathreads}"
 
 ############################## Declaring Binary Containers ##############################
 BINARY_CONTAINERS += $(BUILD_DIR)/compress_decompress.xclbin

@@ -5,4 +5,4 @@ if [[ $PLATFORM = "" ]] ; then
   exit
 fi
 
-make build TARGET=hw DEVICE=$PLATFORM
+time make build TARGET=hw DEVICE=$PLATFORM -j

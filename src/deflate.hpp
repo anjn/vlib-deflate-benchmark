@@ -103,6 +103,22 @@ struct deflate_worker
     device_dyn_ltree_freq = cl::Buffer(context, CL_MEM_READ_WRITE | CL_MEM_HOST_NO_ACCESS, sizeof(uint32_t) * c_ltree_size * num_engines_per_kernel);
     device_dyn_dtree_freq = cl::Buffer(context, CL_MEM_READ_WRITE | CL_MEM_HOST_NO_ACCESS, sizeof(uint32_t) * c_dtree_size * num_engines_per_kernel);
     device_output         = cl::Buffer(context, CL_MEM_WRITE_ONLY, host_buffer_size * 2);
+
+    int narg = 0;
+    lz77_kernel.setArg(narg++, device_input);
+    lz77_kernel.setArg(narg++, device_lz77_output);
+    lz77_kernel.setArg(narg++, device_compress_size);
+    lz77_kernel.setArg(narg++, device_inblk_size);
+    lz77_kernel.setArg(narg++, device_dyn_ltree_freq);
+    lz77_kernel.setArg(narg++, device_dyn_dtree_freq);
+
+    narg = 0;
+    huffman_kernel.setArg(narg++, device_lz77_output);
+    huffman_kernel.setArg(narg++, device_dyn_ltree_freq);
+    huffman_kernel.setArg(narg++, device_dyn_dtree_freq);
+    huffman_kernel.setArg(narg++, device_output);
+    huffman_kernel.setArg(narg++, device_compress_size);
+    huffman_kernel.setArg(narg++, device_inblk_size);
   }
 
   void compress(std::shared_ptr<deflate_job>& job)
@@ -284,7 +300,7 @@ struct deflate_fpga
     }
 
     // Init workers
-    const int num_workers_per_cu = 6;
+    const int num_workers_per_cu = 4;
     const int num_workers_per_device = num_cus_per_device * num_workers_per_cu;
     const int num_cus = num_cus_per_device * devices.size();
     const int num_workers = num_workers_per_device * devices.size();
